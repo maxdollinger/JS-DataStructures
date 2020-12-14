@@ -1,3 +1,37 @@
+/* A linked List implementation:
+Example:
+const LinkedList = require('LinkedList');
+let list = new LinkedList();
+list.add('fooBar');
+
+built-in-Methods:
+
+.from(values)
+    -> adds the values of an arr or object to the list and returns the list-object;
+.push(val)
+    -> adds a value to the end of the list
+.pop()
+    -> removes the last element and returns it's value
+.unshift(val)
+    -> adds a value to the beginning of the list
+.shift()
+    -> removes the first element and returns it's value
+.insert(val, index)
+    -> inserts the value on the given index. If the index is smaller or equals 0 same as unshift.
+    If the index is equal or greater then the number of elements same as push()
+.remove(index)
+    -> removes the element with the passed index. If index is smaller or equals zero same as shift().
+    If index is greater or equals the max number of elements same as pop().
+.get(index)
+    -> returns the value of the element with the passed index
+.set(val, index)
+    -> sets the val of the listitem on index
+.forEach(callBack)
+    -> performs the callback function on each element if the callback has an return value alters the listitem value.
+.toString()
+    -> returns the whole list as a string
+
+*/
 class LinkedList {
     #head = null;
     #tail = null;
@@ -39,7 +73,7 @@ class LinkedList {
         return this.getNode(index).val;
     }
 
-    set(index, val) {
+    set(val, index) {
         if(!index) return false;
         let node = this.getNode(index);
         if(node) {
