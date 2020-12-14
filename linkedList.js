@@ -127,7 +127,8 @@ class LinkedList {
         let node = this.#head;
 
         while (node) {
-            callback(node.val);
+            let result = callback(node.val);
+            if(result !== undefined) node.val = result;
             node = node.next;
         }
     }
