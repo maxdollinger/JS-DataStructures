@@ -70,12 +70,12 @@ class LinkedList {
     }
 
     get(index) {
-        return this.getNode(index).val;
+        return this.#getNode(index).val;
     }
 
     set(val, index) {
         if(!index) return false;
-        let node = this.getNode(index);
+        let node = this.#getNode(index);
         if(node) {
             node.val = val;
             return true;
@@ -84,7 +84,7 @@ class LinkedList {
         }
     }
 
-    getNode(index) {
+    #getNode = (index) => {
         if(index < 0 || index >= this.length) return null;
         let item = this.#head;
         for(let i = 0; i < index; i++) {
@@ -106,7 +106,7 @@ class LinkedList {
             newNode.next = this.#head;
             this.#head = newNode;
         } else {
-            const prevNode = this.getNode(index-1);
+            const prevNode = this.#getNode(index-1);
             newNode.next = prevNode.next;
             prevNode.next = newNode;
         }
@@ -130,8 +130,8 @@ class LinkedList {
             val = this.#head.val;
             this.#head = this.#head.next;
         } else {
-            const node = index === this.length-1 ? this.#tail : this.getNode(index);
-            const prevNode = this.getNode(index-1);
+            const node = index === this.length-1 ? this.#tail : this.#getNode(index);
+            const prevNode = this.#getNode(index-1);
 
             prevNode.next = node.next;
             val = node.val;
