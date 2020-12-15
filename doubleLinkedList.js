@@ -1,4 +1,4 @@
-class LinkedList {
+class DoubleLinkedList {
     #head = null;
     #tail = null;
     #length = 0;
@@ -18,10 +18,18 @@ class LinkedList {
     }
 
     #getNode = ( index ) => {
-        let item = this.#head;
+        let item;
 
-        for( let i = 0; i < index; i++ ) {
-            item = item.next;
+        if( index < this.#length/2 ) {
+            item = this.#head;
+            for( let i = 0; i < index; i++ ) {
+                item = item.next;
+            }
+        } else {
+            item = this.#tail;
+            for( let i = this.#length-1; i > index; i-- ) {
+                item = item.prev;
+            }
         }
 
         return item;
@@ -34,24 +42,28 @@ class LinkedList {
 
     #insertHead = ( newNode ) => {
         newNode.next = this.#head;
+        this.#head.prev = newNode;
         this.#head = newNode;
     }
 
     #insertTail = ( newNode ) => {
         this.#tail.next = newNode;
+        newNode.prev = this.#tail;
         this.#tail = newNode;
     }
 
-    #insertNode = ( newNode, index ) => {
+    #insertNode = ( newNode ) => {
         const currentNode = this.#getNode( index );
-        const prevNode = this.#getNode( index-1 );
 
+        newNode.prev = currentNode.prev;
         newNode.next = currentNode;
-        prevNode.next = newNode;
+        currentNode.prev.next = newNode;
+        currentNode.prev = newNode;
     }
 
     insert( val, index ) {
         if( !this.#validIndex( index ) )  index = this.#length;
+
         const newNode = this.#node( val );
 
         if( this.#length === 0 ) {
@@ -61,7 +73,7 @@ class LinkedList {
         } else if( index === this.#length ) {
             this.#insertTail( newNode );
         } else {
-            this.#insertNode( newNode, index );
+            this.#insertNode( newNode );
         }
 
         this.#length++;
@@ -79,6 +91,7 @@ class LinkedList {
         const node = this.#head;
 
         this.#head = node.next;
+        this.#head.prev = null;
 
         return node;
     }
@@ -86,7 +99,7 @@ class LinkedList {
     #removeTail = () => {
         const node = this.#tail;
 
-        this.#tail = this.#getNode(this.#length - 2);
+        this.#tail = node.prev;
         this.#tail.next = null;
 
         return node;
@@ -94,16 +107,16 @@ class LinkedList {
 
     #removeNode = ( index ) => {
         const node = this.#getNode( index );
-        const prevNode = this.#getNode( index-1 );
 
-
-        prevNode.next = node.next;
+        node.next.prev = node.prev;
+        node.prev.next = node.next;
 
         return node;
     }
 
     remove( index ) {
-        if( !this.#validIndex( index ) ) index = this.#length - 1;
+        if( !this.#validIndex( index ) )  index = this.#length-1;
+
         if( this.#length === 0 ) return null;
 
         let node;
@@ -119,7 +132,7 @@ class LinkedList {
         }
 
         this.#length--;
-        node.next = null;
+        node.prev = node.next = null;
         return node.val;
     }
 
@@ -133,8 +146,7 @@ class LinkedList {
         if( !this.#validIndex( index ) ) return false;
 
         this.#getNode( index ).val = val;
-
-        return true;
+        return true
     }
 
     push( val ) {
@@ -150,7 +162,7 @@ class LinkedList {
     }
 
     shift() {
-        return this.remove(0);
+        return this.remove( 0 );
     }
 
     size() {
@@ -163,19 +175,32 @@ class LinkedList {
         } else if( values instanceof Object ) {
             Object.values( values ).forEach( el => this.insert( el ) )
         }
+
         return this;
     }
 
-    forEach( callback ) {
-        let node = this.#head;
-        let index = 0;
+    forEach( callback, order ) {
+        let node, index;
+
+        if( order === -1 ) {
+            node = this.#tail;
+            index = this.#length-1;
+        } else {
+            node = this.#head;
+            index = 0;
+        }
 
         while( node ) {
             let result = callback( node.val, index );
             if( result !== undefined ) node.val = result;
 
-            node = node.next;
-            index++;
+            if( order === -1 ) {
+                node = node.prev;
+                index--;
+            } else {
+                node = node.next;
+                index++;
+            }
         }
     }
 
@@ -193,4 +218,4 @@ class LinkedList {
     }
 }
 
-module.exports = LinkedList;
+module.exports = DoubleLinkedList;
