@@ -52,7 +52,7 @@ class DoubleLinkedList {
         this.#tail = newNode;
     }
 
-    #insertNode = ( newNode ) => {
+    #insertNode = ( newNode, index ) => {
         const currentNode = this.#getNode( index );
 
         newNode.prev = currentNode.prev;
@@ -73,7 +73,7 @@ class DoubleLinkedList {
         } else if( index === this.#length ) {
             this.#insertTail( newNode );
         } else {
-            this.#insertNode( newNode );
+            this.#insertNode( newNode, index );
         }
 
         this.#length++;
