@@ -2,19 +2,45 @@ class DoubleLinkedList {
     #head = null;
     #tail = null;
     #length = 0;
+    #type;
 
-    #node = ( val ) => {
+    constructor( type ) {
+        this.#type = type;
+    }
+
+    from( values ) {
+        if( values instanceof Array ) {
+            values.forEach( el => this.insert( el ) );
+        } else if( values instanceof Object ) {
+            Object.values( values ).forEach( el => this.insert( el ) )
+        } else {
+            this.insert( values )
+        }
+
+        return this;
+    }
+
+    #node = ( value ) => {
         return {
             prev: null,
-            val,
+            value,
             next: null
         }
     }
 
     #validIndex = ( index ) => {
-        return !(typeof index !== 'number' ||
-            index < 0 ||
-            index >= this.#length);
+        return (typeof index === 'number' &&
+            index >= 0 &&
+            index < this.#length);
+    }
+
+    #validValue = ( value ) => {
+        if(this.#type === undefined) return true;
+        if(this.#type instanceof Object) {
+            return value instanceof this.#type;
+        } else {
+            return typeof value === this.#type;
+        }
     }
 
     #getNode = ( index ) => {
@@ -61,10 +87,11 @@ class DoubleLinkedList {
         currentNode.prev = newNode;
     }
 
-    insert( val, index ) {
+    insert( value, index ) {
+        if( !this.#validValue( value )) return this;
         if( !this.#validIndex( index ) )  index = this.#length;
 
-        const newNode = this.#node( val );
+        const newNode = this.#node( value );
 
         if( this.#length === 0 ) {
             this.#startList( newNode );
@@ -77,14 +104,16 @@ class DoubleLinkedList {
         }
 
         this.#length++;
-        return newNode.val;
+        return this;
     }
 
     #endList = () => {
+        const node = this.#head;
+
         this.#head = null;
         this.#tail = null;
 
-        return null;
+        return node;
     }
 
     #removeHead = () => {
@@ -133,32 +162,33 @@ class DoubleLinkedList {
 
         this.#length--;
         node.prev = node.next = null;
-        return node.val;
+        return node.value;
     }
 
     get( index ) {
         if( !this.#validIndex( index ) ) return null;
 
-        return this.#getNode( index ).val;
+        return this.#getNode( index ).value;
     }
 
-    set( index, val ) {
+    set( index, value ) {
+        if( !this.#validValue( value )) return false;
         if( !this.#validIndex( index ) ) return false;
 
-        this.#getNode( index ).val = val;
+        this.#getNode( index ).value = value;
         return true
     }
 
-    push( val ) {
-        return this.insert( val );
+    push( value ) {
+        return this.insert( value );
     }
 
     pop() {
         return this.remove();
     }
 
-    unshift( val ) {
-        return this.insert( val, 0 );
+    unshift( value ) {
+        return this.insert( value, 0 );
     }
 
     shift() {
@@ -167,16 +197,6 @@ class DoubleLinkedList {
 
     size() {
         return this.#length;
-    }
-
-    from( values ) {
-        if( values instanceof Array ) {
-            values.forEach( el => this.insert( el ) );
-        } else if( values instanceof Object ) {
-            Object.values( values ).forEach( el => this.insert( el ) )
-        }
-
-        return this;
     }
 
     forEach( callback, order ) {
@@ -191,8 +211,9 @@ class DoubleLinkedList {
         }
 
         while( node ) {
-            let result = callback( node.val, index );
-            if( result !== undefined ) node.val = result;
+            let result = callback( node.value, index );
+            if( !this.#validValue( result )) result = undefined;
+            if( result !== undefined ) node.value = result;
 
             if( order === -1 ) {
                 node = node.prev;
@@ -205,12 +226,13 @@ class DoubleLinkedList {
     }
 
     toString() {
-        if( this.#length === 0 ) return '';
+        let str = '';
+        let node = this.#head;
 
-        let str = `${this.#head.val}`;
-        let node = this.#head.next;
-        while( node ) {
-            str = str + ' | ' + node.val;
+        for(let i = 0; i < this.#length; i++) {
+            if( node !== this.#head ) str = str + ` <-> `;
+            str = str + node.value;
+
             node = node.next;
         }
 

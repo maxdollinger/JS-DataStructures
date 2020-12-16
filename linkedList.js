@@ -3,10 +3,22 @@ class LinkedList {
     #tail = null;
     #length = 0;
 
-    #node = ( val ) => {
+    constructor( value ) {
+        if( value instanceof Array ) {
+            value.forEach( el => this.insert( el ) );
+        } else if( value instanceof Object ) {
+            Object.values( value ).forEach( el => this.insert( el ) )
+        } else {
+            this.insert( value );
+        }
+
+        return this;
+    }
+
+    #node = ( value ) => {
         return {
             prev: null,
-            val,
+            value,
             next: null
         }
     }
@@ -50,9 +62,9 @@ class LinkedList {
         prevNode.next = newNode;
     }
 
-    insert( val, index ) {
+    insert( value, index ) {
         if( !this.#validIndex( index ) )  index = this.#length;
-        const newNode = this.#node( val );
+        const newNode = this.#node( value );
 
         if( this.#length === 0 ) {
             this.#startList( newNode );
@@ -65,14 +77,16 @@ class LinkedList {
         }
 
         this.#length++;
-        return newNode.val;
+        return this;
     }
 
     #endList = () => {
+        const node = this.#head;
+
         this.#head = null;
         this.#tail = null;
 
-        return null;
+        return node;
     }
 
     #removeHead = () => {
@@ -120,33 +134,33 @@ class LinkedList {
 
         this.#length--;
         node.next = null;
-        return node.val;
+        return node.value;
     }
 
     get( index ) {
         if( !this.#validIndex( index ) ) return null;
 
-        return this.#getNode( index ).val;
+        return this.#getNode( index ).value;
     }
 
-    set( index, val ) {
+    set( index, value ) {
         if( !this.#validIndex( index ) ) return false;
 
-        this.#getNode( index ).val = val;
+        this.#getNode( index ).value = value;
 
-        return true;
+        return this;
     }
 
-    push( val ) {
-        return this.insert( val );
+    push( value ) {
+        return this.insert( value );
     }
 
     pop() {
         return this.remove();
     }
 
-    unshift( val ) {
-        return this.insert( val, 0 );
+    unshift( value ) {
+        return this.insert( value, 0 );
     }
 
     shift() {
@@ -157,12 +171,8 @@ class LinkedList {
         return this.#length;
     }
 
-    from( values ) {
-        if( values instanceof Array ) {
-            values.forEach( el => this.insert( el ) );
-        } else if( values instanceof Object ) {
-            Object.values( values ).forEach( el => this.insert( el ) )
-        }
+    from( value ) {
+
         return this;
     }
 
@@ -171,8 +181,8 @@ class LinkedList {
         let index = 0;
 
         while( node ) {
-            let result = callback( node.val, index );
-            if( result !== undefined ) node.val = result;
+            let result = callback( node.value, index );
+            if( result !== undefined ) node.value = result;
 
             node = node.next;
             index++;
@@ -180,12 +190,13 @@ class LinkedList {
     }
 
     toString() {
-        if( this.#length === 0 ) return '';
+        let str = '';
+        let node = this.#head;
 
-        let str = `${this.#head.val}`;
-        let node = this.#head.next;
-        while( node ) {
-            str = str + ' | ' + node.val;
+        for(let i = 0; i < this.#length; i++) {
+            if( node !== this.#head ) str = str + ` -> `;
+            str = str + node.value;
+
             node = node.next;
         }
 
