@@ -35,8 +35,8 @@ class DoubleLinkedList {
     }
 
     #validValue = ( value ) => {
-        if(this.#type === undefined) return true;
-        if(this.#type instanceof Object) {
+        if( this.#type === undefined ) return true;
+        if( this.#type instanceof Object ) {
             return value instanceof this.#type;
         } else {
             return typeof value === this.#type;
@@ -88,7 +88,7 @@ class DoubleLinkedList {
     }
 
     insert( value, index ) {
-        if( !this.#validValue( value )) return this;
+        if( !this.#validValue( value ) ) return this;
         if( !this.#validIndex( index ) )  index = this.#length;
 
         const newNode = this.#node( value );
@@ -172,7 +172,7 @@ class DoubleLinkedList {
     }
 
     set( index, value ) {
-        if( !this.#validValue( value )) return false;
+        if( !this.#validValue( value ) ) return false;
         if( !this.#validIndex( index ) ) return false;
 
         this.#getNode( index ).value = value;
@@ -212,8 +212,7 @@ class DoubleLinkedList {
 
         while( node ) {
             let result = callback( node.value, index );
-            if( !this.#validValue( result )) result = undefined;
-            if( result !== undefined ) node.value = result;
+            if( this.#validValue( result ) ) node.value = result;
 
             if( order === -1 ) {
                 node = node.prev;
