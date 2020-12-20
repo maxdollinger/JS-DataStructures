@@ -21,8 +21,6 @@ class Graph {
 
         while( (current = queue.dequeue()) !== undefined ) {
             visited[current] = true;
-            console.log(queue.toString())
-            console.log(visited);
 
             this.adjList[current].forEach( el => {
                 let vertex = el[0];
