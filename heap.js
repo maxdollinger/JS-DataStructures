@@ -1,17 +1,14 @@
 class Heap {
     #heap = [];
+    #comparator = ( a, b ) => a - b ;
 
-    #validIndex = ( index ) => {
-        return index >=0 && index < this.#heap.length ? index : undefined;
+    constructor( cmp ) {
+        cmp && (this.#comparator = cmp);
     }
 
     #parentIndex = ( childIndex ) => {
-       const index = Math.floor( (childIndex-1)/2 );
-       return this.#validIndex(index) ? index : 0;
-    }
-
-    #compareToParent = ( prio, parentIndex ) => {
-        return prio < this.#heap[parentIndex].prio;
+        if( childIndex <= 0 ) return 0;
+        return childIndex % 2 === 0 ? (childIndex-2)/2 : (childIndex-1)/2;
     }
 
     #swap = ( i, j, arr = this.#heap ) => [ arr[i], arr[j] ] = [ arr[j], arr[i] ];
@@ -26,8 +23,7 @@ class Heap {
         let childIndex = this.#heap.length-1;
         let parentIndex = this.#parentIndex( childIndex );
 
-        while( this.#compareToParent(prio, parentIndex) ) {
-
+        while( this.#comparator( prio, this.#heap[parentIndex].prio ) < 0 ) {
             this.#swap( parentIndex, childIndex );
 
             childIndex = parentIndex;
@@ -38,8 +34,8 @@ class Heap {
     }
 
     #children = ( parentIndex ) => {
-        const left = this.#validIndex((2*parentIndex) + 1);
-        const right = this.#validIndex((2*parentIndex) + 2);
+        const left =  (2*parentIndex) + 1 < this.#heap.length ? (2*parentIndex) + 1 : undefined;
+        const right =  (2*parentIndex) + 2 < this.#heap.length ? (2*parentIndex) + 2 : undefined;
 
         return {
             left: {
@@ -54,21 +50,17 @@ class Heap {
     }
 
     #compareToChildren = ( parent, children ) => {
-        const left = children.left.prio;
-        const right = children.right.prio;
+        const left = this.#comparator( children.left.prio, parent );
+        const right = this.#comparator( children.right.prio, parent  );
 
-        if( parent > left && parent > right ) {
-            return left < right ? children.left.index : children.right.index;
-        } else if( parent > left ) {
-            return children.left.index;
-        }  else if( parent > right ) {
-            return children.right.index;
+        if( left || right ) {
+            return left > right ? children.right.index : children.left.index;
         } else {
             return null;
         }
     }
 
-    dequeue() {
+    pop() {
         if(this.isEmpty()) return undefined;
 
         this.#swap(0, this.#heap.length-1);
@@ -78,17 +70,16 @@ class Heap {
 
         let parentIndex = 0;
         let children = this.#children( parentIndex );
-        let childToSwap = this.#compareToChildren( parent, children );
+        let childToSwap;
 
-        while( childToSwap ) {
+        while( childToSwap = this.#compareToChildren( parent, children ) ) {
             this.#swap( parentIndex, childToSwap );
 
             parentIndex = childToSwap;
             children = this.#children( parentIndex );
-            childToSwap = this.#compareToChildren( parent, children );
         }
 
-        return extracted !== undefined ? extracted : null;
+        return extracted;
     }
 
     isEmpty() {

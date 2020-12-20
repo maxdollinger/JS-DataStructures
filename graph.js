@@ -19,7 +19,7 @@ class Graph {
         const queue = new Heap().add(0, start);
         let current;
 
-        while( (current = queue.dequeue()) !== undefined ) {
+        while( (current = queue.pop()) !== undefined ) {
             visited[current] = true;
 
             this.adjList[current].forEach( el => {
@@ -64,6 +64,7 @@ class Graph {
 
         return {
             dist,
+            pathToString,
             logPaths
         };
     }
