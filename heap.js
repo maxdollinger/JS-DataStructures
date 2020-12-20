@@ -1,25 +1,32 @@
 class Heap {
     #heap = [];
 
-    #parentIndex = ( childIndex ) => {
-       return Math.floor( (childIndex-1)/2 );
+    #validIndex = ( index ) => {
+        return index >=0 && index < this.#heap.length ? index : undefined;
     }
 
-    #compareToParent = ( value, parentIndex ) => value > this.#heap[parentIndex];
+    #parentIndex = ( childIndex ) => {
+       const index = Math.floor( (childIndex-1)/2 );
+       return this.#validIndex(index) ? index : 0;
+    }
+
+    #compareToParent = ( prio, parentIndex ) => {
+        return prio < this.#heap[parentIndex].prio;
+    }
 
     #swap = ( i, j, arr = this.#heap ) => [ arr[i], arr[j] ] = [ arr[j], arr[i] ];
 
-    add( value ) {
+    add( prio, value ) {
         if( this.#heap.length === 0 ) {
-            this.#heap.push( value );
+            this.#heap.push( {prio, value} );
             return this;
         }
 
-        this.#heap.push( value );
+        this.#heap.push( {prio, value} );
         let childIndex = this.#heap.length-1;
         let parentIndex = this.#parentIndex( childIndex );
 
-        while( this.#compareToParent(value, parentIndex) ) {
+        while( this.#compareToParent(prio, parentIndex) ) {
 
             this.#swap( parentIndex, childIndex );
 
@@ -31,30 +38,30 @@ class Heap {
     }
 
     #children = ( parentIndex ) => {
-        const left = (2*parentIndex) + 1;
-        const right = (2*parentIndex) + 2;
+        const left = this.#validIndex((2*parentIndex) + 1);
+        const right = this.#validIndex((2*parentIndex) + 2);
 
         return {
-            left : {
+            left: {
                 index: left,
-                value: this.#heap[left],
+                prio: left? this.#heap[left].prio : undefined
             },
-            right : {
+            right: {
                 index: right,
-                value: this.#heap[right],
+                prio: right ? this.#heap[right].prio : undefined
             }
-        };
+        }
     }
 
     #compareToChildren = ( parent, children ) => {
-        const left = children.left.value;
-        const right = children.right.value;
+        const left = children.left.prio;
+        const right = children.right.prio;
 
-        if( parent < left && parent < right ) {
-            return left > right ? children.left.index : children.right.index;
-        } else if( parent < left && parent > right ) {
+        if( parent > left && parent > right ) {
+            return left < right ? children.left.index : children.right.index;
+        } else if( parent > left && parent < right ) {
             return children.left.index;
-        }  else if( parent < right && parent > left ) {
+        }  else if( parent > right && parent < left ) {
             return children.right.index;
         } else {
             return null;
@@ -62,10 +69,12 @@ class Heap {
     }
 
     dequeue() {
+        if(this.isEmpty()) return null;
+
         this.#swap(0, this.#heap.length-1);
 
-        const extracted = this.#heap.pop();
-        const parent = this.#heap[0];
+        const parent = this.#heap[0].prio;
+        const extracted = this.#heap.pop().value;
 
         let parentIndex = 0;
         let children = this.#children( parentIndex );
@@ -82,8 +91,12 @@ class Heap {
         return extracted !== undefined ? extracted : null;
     }
 
+    isEmpty() {
+        return this.#heap.length === 0;
+    }
+
     toString() {
-        return this.#heap.toString();
+        return this.#heap;
     }
 }
 
