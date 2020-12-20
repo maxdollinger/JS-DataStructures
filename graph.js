@@ -17,10 +17,12 @@ class Graph {
         const path = { [start]: null};
         const dist = { [start]: 0 };
         const queue = new Heap().add(0, start);
-        let current = queue.dequeue();
+        let current;
 
-        while( !visited[current] ) {
+        while( (current = queue.dequeue()) !== undefined ) {
             visited[current] = true;
+            console.log(queue.toString())
+            console.log(visited);
 
             this.adjList[current].forEach( el => {
                 let vertex = el[0];
@@ -37,10 +39,7 @@ class Graph {
 
                 !visited[vertex] && (queue.add(weight, vertex));
             });
-
-            current = queue.dequeue();
         }
-
 
         function pathToString( end ) {
             let current = end;

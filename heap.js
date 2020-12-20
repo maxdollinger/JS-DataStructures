@@ -44,7 +44,7 @@ class Heap {
         return {
             left: {
                 index: left,
-                prio: left? this.#heap[left].prio : undefined
+                prio: left ? this.#heap[left].prio : undefined
             },
             right: {
                 index: right,
@@ -59,9 +59,9 @@ class Heap {
 
         if( parent > left && parent > right ) {
             return left < right ? children.left.index : children.right.index;
-        } else if( parent > left && parent < right ) {
+        } else if( parent > left ) {
             return children.left.index;
-        }  else if( parent > right && parent < left ) {
+        }  else if( parent > right ) {
             return children.right.index;
         } else {
             return null;
@@ -69,7 +69,7 @@ class Heap {
     }
 
     dequeue() {
-        if(this.isEmpty()) return null;
+        if(this.isEmpty()) return undefined;
 
         this.#swap(0, this.#heap.length-1);
 
