@@ -50,6 +50,8 @@ class Heap {
 
             break;
         }
+
+        this.#bubbleUp( heap[heap.length-1] )
     }
 
     pop() {
@@ -70,7 +72,12 @@ class Heap {
     }
 
     toString() {
-        return this.#heap;
+        let str = '';
+
+        this.#heap.forEach( el => {
+            str += el.prio + ':' + el.value + ' | ';
+        })
+        return str;
     }
 }
 
