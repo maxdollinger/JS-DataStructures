@@ -22,12 +22,13 @@ class Heap {
     #swap = (i, j) => [this.#arr[i], this.#arr[j]] = [this.#arr[j], this.#arr[i]];
 
     #bubbleUp = (idx) => {
-        let parentIdx;
+        let parentIdx = (idx - 1) >> 1;
 
-        while ((parentIdx = (idx - 1) >> 1) >= 0) {
+        while (parentIdx >= 0) {
             if (this.#comp(idx, parentIdx)) {
                 this.#swap(idx, parentIdx);
                 idx = parentIdx;
+                parentIdx = (idx - 1) >> 1;
                 continue;
             }
 
@@ -47,7 +48,7 @@ class Heap {
         leftC = 2 * idx + 1;
 
         while (leftC < this.size) {
-            rightC = leftC+1;
+            rightC = leftC + 1;
 
             smallerC = rightC < this.size && this.#comp(rightC, leftC) ? rightC : leftC;
 
