@@ -29,6 +29,7 @@ class Heap {
                 this.#swap(idx, parentIdx);
                 idx = parentIdx;
                 parentIdx = (idx - 1) >> 1;
+
                 continue;
             }
 
@@ -57,6 +58,7 @@ class Heap {
                 this.#swap(smallerC, idx);
                 idx = smallerC;
                 leftC = 2 * idx + 1;
+
                 continue;
             }
 
@@ -110,10 +112,10 @@ class Heap {
 
     toString() {
         let str = '';
-
         this.#arr.forEach(el => {
             str += el.priority + ':' + el.value + ' | ';
-        })
+        });
+
         return str;
     }
 
