@@ -1,21 +1,23 @@
 class Heap {
     #arr = [];
     #pointer = 0
-    #comp = (a, b) => a - b;
+    #comparator = (a, b) => a - b;
 
     constructor(comp) {
         Object.defineProperty(this, 'size', {
             get: () => this.#arr.length,
         });
 
-        if (comp instanceof Function) this.#comp = comp;
+        if (comp instanceof Function) this.#comparator = comp;
     }
 
     #node = (priority, value) => ({priority, value});
 
-    #prio = (idx) => this.#arr[idx].priority;
+    #prio = (idx) => this.#arr[idx] ? this.#arr[idx].priority : undefined;
 
     #value = (node) => node ? node.value : undefined;
+
+    #comp = (aIdx, bIdx) => this.#comparator(this.#prio(aIdx), this.#prio(bIdx)) < 0;
 
     #swap = (i, j) => [this.#arr[i], this.#arr[j]] = [this.#arr[j], this.#arr[i]];
 
@@ -23,7 +25,7 @@ class Heap {
         let parentIdx;
 
         while ((parentIdx = (idx - 1) >> 1) >= 0) {
-            if (this.#prio(idx) < this.#prio(parentIdx)) {
+            if (this.#comp(idx, parentIdx)) {
                 this.#swap(idx, parentIdx);
                 idx = parentIdx;
                 continue;
@@ -41,24 +43,18 @@ class Heap {
     }
 
     #sinkDown = (idx) => {
-        let leftChild = 2 * idx + 1;
+        let leftC, rightC, smallerC;
+        leftC = 2 * idx + 1;
 
-        while (leftChild < this.size) {
-            let idxToSwap;
-            let rightChild = leftChild + 1;
+        while (leftC < this.size) {
+            rightC = leftC+1;
 
-            if (rightChild < this.size &&
-                this.#prio(rightChild) < this.#prio(idx)) {
-                idxToSwap = this.#prio(leftChild) < this.#prio(rightChild) ? leftChild : rightChild;
-            } else if (this.#prio(leftChild) < this.#prio(idx)) {
-                idxToSwap = leftChild;
-            }
+            smallerC = rightC < this.size && this.#comp(rightC, leftC) ? rightC : leftC;
 
-            if (idxToSwap) {
-                this.#swap(idx, idxToSwap);
-                idx = idxToSwap;
-                leftChild = 2 * idx + 1;
-
+            if (this.#comp(smallerC, idx)) {
+                this.#swap(smallerC, idx);
+                idx = smallerC;
+                leftC = 2 * idx + 1;
                 continue;
             }
 
