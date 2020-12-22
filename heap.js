@@ -23,7 +23,7 @@ class Heap {
         let parentIdx;
 
         while ((parentIdx = (idx - 1) >> 1) >= 0) {
-            if (this.#comp(this.#prio(idx), this.#prio(parentIdx)) < 0) {
+            if (this.#prio(idx) < this.#prio(parentIdx)) {
                 this.#swap(idx, parentIdx);
                 idx = parentIdx;
                 continue;
@@ -42,18 +42,19 @@ class Heap {
 
     #sinkDown = (idx) => {
         let leftChild = 2 * idx + 1;
-        let idxToSwap, rightChild;
 
         while (leftChild < this.size) {
-            if (this.#comp(this.#prio(leftChild), this.#prio(idx)) < 0) {
+            let idxToSwap;
+            let rightChild = leftChild + 1;
+
+            if (rightChild < this.size &&
+                this.#prio(rightChild) < this.#prio(idx)) {
+                idxToSwap = this.#prio(leftChild) < this.#prio(rightChild) ? leftChild : rightChild;
+            } else if (this.#prio(leftChild) < this.#prio(idx)) {
                 idxToSwap = leftChild;
-                rightChild = leftChild + 1;
+            }
 
-                if (rightChild < this.size &&
-                    this.#comp(this.#prio(rightChild), this.#prio(leftChild)) < 0) {
-                    idxToSwap = rightChild;
-                }
-
+            if (idxToSwap) {
                 this.#swap(idx, idxToSwap);
                 idx = idxToSwap;
                 leftChild = 2 * idx + 1;
@@ -104,7 +105,7 @@ class Heap {
         if (obj instanceof Array || obj instanceof Function) {
             console.log("only objects with structure { value : priority } allowed")
         } else if (obj instanceof Object) {
-            Object.keys(obj).forEach(el => this.add(obj[el], el ))
+            Object.keys(obj).forEach(el => this.add(obj[el], el))
         }
 
         return this;
