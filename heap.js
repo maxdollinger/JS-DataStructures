@@ -40,6 +40,7 @@ class Heap {
         const node = this.#node(priority, value);
         this.#arr.push(node);
         this.#bubbleUp(this.size - 1);
+
         return this;
     }
 
@@ -65,7 +66,6 @@ class Heap {
 
     #remove = () => {
         this.#swap(0, this.size - 1);
-
         const rmNode = this.#arr.pop();
         this.#sinkDown(0);
 

@@ -1,5 +1,10 @@
-#Webstorm Folder
+#Folders
 .idea/*
+cert/
+node_modules/
 
 #Test File
 app.js
+
+#json files
+*.json
