@@ -1,21 +1,31 @@
 class Heap {
-    #heap = [];
-    #comparator = ( a, b ) => a - b ;
+    #arr = [];
+    #pointer = 0
+    #comp = (a, b) => a - b;
 
-    constructor( cmp ) {
-        cmp && (this.#comparator = cmp);
+    constructor(comp) {
+        Object.defineProperty(this, 'size', {
+            get: () => this.#arr.length,
+        });
+
+        if (comp instanceof Function) this.#comp = comp;
     }
 
-    #swap = ( i, j, arr = this.#heap ) => [ arr[i], arr[j] ] = [ arr[j], arr[i] ];
+    #node = (priority, value) => ({priority, value});
 
-    #bubbleUp = ( item, heap = this.#heap, startIndex = heap.length-1 ) => {
-        let parentIndex;
+    #prio = (idx) => this.#arr[idx].priority;
 
-        while( (parentIndex = (startIndex-1) >> 1) >= 0 ) {
-            if( this.#comparator( item.prio, heap[parentIndex].prio ) < 0 ) {
-                this.#swap( startIndex, parentIndex );
+    #value = (node) => node ? node.value : undefined;
 
-                startIndex = parentIndex;
+    #swap = (i, j) => [this.#arr[i], this.#arr[j]] = [this.#arr[j], this.#arr[i]];
+
+    #bubbleUp = (idx) => {
+        let parentIdx;
+
+        while ((parentIdx = (idx - 1) >> 1) >= 0) {
+            if (this.#comp(this.#prio(idx), this.#prio(parentIdx)) < 0) {
+                this.#swap(idx, parentIdx);
+                idx = parentIdx;
                 continue;
             }
 
@@ -23,62 +33,92 @@ class Heap {
         }
     }
 
-    add( prio, value ) {
-        const newItem = {prio, value};
-        this.#heap.push( newItem );
-        this.#bubbleUp( newItem );
-
+    #insert = (priority, value) => {
+        const node = this.#node(priority, value);
+        this.#arr.push(node);
+        this.#bubbleUp(this.size - 1);
         return this;
     }
 
-    #sinkDown = ( item, index = 0, heap = this.#heap ) => {
-        let left, right, indexToSwap;
+    #sinkDown = (idx) => {
+        let leftChild = 2 * idx + 1;
+        let idxToSwap, rightChild;
 
-        while( ((2*index) + 2) < heap.length ) {
-            const leftChild =  heap[(2*index) + 1].prio;
-            const rightChild =  heap[(2*index) + 2].prio;
+        while (leftChild < this.size) {
+            if (this.#comp(this.#prio(leftChild), this.#prio(idx)) < 0) {
+                idxToSwap = leftChild;
+                rightChild = leftChild + 1;
 
-            left = this.#comparator( leftChild, item );
-            right = this.#comparator( rightChild, item );
+                if (rightChild < this.size &&
+                    this.#comp(this.#prio(rightChild), this.#prio(leftChild)) < 0) {
+                    idxToSwap = rightChild;
+                }
 
-            if( left < 0 || right < 0 ) {
-                indexToSwap = left > right ? (2*index) + 2 : (2*index) + 1;
-                this.#swap( index, indexToSwap );
-                index = indexToSwap;
+                this.#swap(idx, idxToSwap);
+                idx = idxToSwap;
+                leftChild = 2 * idx + 1;
+
                 continue;
             }
 
             break;
         }
+    }
 
-        this.#bubbleUp( heap[heap.length-1] )
+    #remove = () => {
+        this.#swap(0, this.size - 1);
+
+        const rmNode = this.#arr.pop();
+        this.#sinkDown(0);
+
+        return this.#value(rmNode);
+    }
+
+    add(priority, value) {
+        return this.#insert(priority, value);
     }
 
     pop() {
-        if(this.isEmpty()) return undefined;
-
-        this.#swap(0, this.#heap.length-1);
-
-        const parent = this.#heap[0].prio;
-        const extracted = this.#heap.pop().value;
-
-        this.#sinkDown( parent );
-
-        return extracted;
+        return this.#remove();
     }
 
-    isEmpty() {
-        return this.#heap.length === 0;
+    peek() {
+        return this.#value(this.#arr[0]);
+    }
+
+    next() {
+        this.#pointer <= this.size && this.#pointer++;
+        return this.#value(this.#arr[this.#pointer]);
+    }
+
+    prev() {
+        this.#pointer >= -1 && this.#pointer--;
+        return this.#value(this.#arr[this.#pointer]);
+    }
+
+    get(idx) {
+        return this.#value(this.#arr[idx]);
+    }
+
+    from(obj) {
+        if (obj instanceof Array || obj instanceof Function) {
+            console.log("only objects with structure { value : priority } allowed")
+        } else if (obj instanceof Object) {
+            Object.keys(obj).forEach(el => this.add(obj[el], el ))
+        }
+
+        return this;
     }
 
     toString() {
         let str = '';
 
-        this.#heap.forEach( el => {
-            str += el.prio + ':' + el.value + ' | ';
+        this.#arr.forEach(el => {
+            str += el.priority + ':' + el.value + ' | ';
         })
         return str;
     }
+
 }
 
 module.exports = Heap;
